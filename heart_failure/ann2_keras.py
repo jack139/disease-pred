@@ -13,9 +13,9 @@ from sklearn.metrics import precision_score, recall_score, confusion_matrix, cla
 
 #loading data
 data = pd.read_csv("../datasets/heart_failure_clinical_records_dataset.csv")
-data.head()
+#data.head()
 
-data.info()
+#data.info()
 
 data.describe().T
 

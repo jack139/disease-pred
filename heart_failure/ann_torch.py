@@ -23,17 +23,9 @@ warnings.filterwarnings(action='ignore')
 
 train_df = pd.read_csv('../datasets/heart_failure_clinical_records_dataset.csv')
 
-train_df.info()
+#train_df.info()
 
-print(train_df.describe())
-
-'''
-fig, ax = plt.subplots()
-ax.boxplot([train_df.platelets,train_df.creatinine_phosphokinase])
-plt.xticks([1,2],['platelets','creatinine_phosphokinase'])
-plt.legend()
-plt.show()
-'''
+#print(train_df.describe())
 
 fix_features = pd.concat([train_df.platelets],axis=1)
 scaler = MinMaxScaler(feature_range=(0,1))
@@ -49,19 +41,19 @@ print(df.DEATH_EVENT.value_counts(normalize=True)*100)
 
 # 准备数据
 train, test = df[:-40], df[-40:]
-print(train.shape,test.shape)
+print(train.shape, test.shape)
 
 y_train = df.DEATH_EVENT
 x_train = df.drop('DEATH_EVENT',axis=1)
-print(x_train.shape,y_train.shape)
+print(x_train.shape, y_train.shape)
 
 x_train, x_test, y_train, y_test = train_test_split(x_train,y_train,test_size=0.3,shuffle=True)
 
 smote = SMOTE(random_state=0)
-x_train_oversample , y_train_oversample = smote.fit_resample(x_train.values,y_train.values) 
+x_train_oversample, y_train_oversample = smote.fit_resample(x_train.values,y_train.values) 
 
 print(x_train_oversample.shape , y_train_oversample.shape)
-print(x_test.shape,y_test.shape)
+print(x_test.shape, y_test.shape)
 
 
 # 数据集
