@@ -24,3 +24,5 @@ build/
 colab/
 *.weights
 *.zip
+
+*.pt
