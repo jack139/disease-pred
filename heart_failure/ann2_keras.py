@@ -19,6 +19,8 @@ data = pd.read_csv("../datasets/heart_failure_clinical_records_dataset.csv")
 
 data.describe().T
 
+data = data[data['ejection_fraction']<70]
+
 #assigning values to features as X and target as y
 X=data.drop(["DEATH_EVENT"],axis=1)
 y=data["DEATH_EVENT"]
@@ -31,7 +33,7 @@ X_df = pd.DataFrame(X_df, columns=col_names)
 X_df.describe().T
 
 #spliting test and training sets
-X_train, X_test, y_train,y_test = train_test_split(X_df,y,test_size=0.25,random_state=7)
+X_train, X_test, y_train, y_test = train_test_split(X_df, y, test_size=0.2, random_state=7)
 
 
 #MODEL BUILDING
@@ -51,22 +53,26 @@ model.add(Dropout(0.25))
 model.add(Dense(units = 4, kernel_initializer = 'uniform', activation = 'relu'))
 model.add(Dropout(0.5))
 model.add(Dense(units = 1, kernel_initializer = 'uniform', activation = 'sigmoid'))
-from keras.optimizers import SGD
+
 # Compiling the ANN
 model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
 
 # Train the ANN
-history = model.fit(X_train, y_train, batch_size = 32, epochs = 500,callbacks=[early_stopping], validation_split=0.2)
+history = model.fit(X_train, y_train, 
+	batch_size = 32, 
+	epochs = 500,
+	callbacks=[early_stopping], 
+	#validation_split=0.2
+)
 
-# test result
-val_accuracy = np.mean(history.history['val_accuracy'])
-print("\n%s: %.2f%%" % ('val_accuracy', val_accuracy*100))
+# valuated result
+#val_accuracy = np.mean(history.history['val_accuracy'])
+#print("\n%s: %.2f%%" % ('val_accuracy', val_accuracy*100))
 
 
 # Predicting the test set results
 y_pred = model.predict(X_test)
 y_pred = (y_pred > 0.5)
 np.set_printoptions()
-
 
 print(classification_report(y_test, y_pred))

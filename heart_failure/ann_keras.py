@@ -14,7 +14,7 @@ df_heart = pd.read_csv('../datasets/heart_failure_clinical_records_dataset.csv')
 
 df_heart = df_heart[df_heart['ejection_fraction']<70]
 
-
+# 只使用了 ejection_fraction, serum_creatinine, time
 x = df_heart.iloc[:, [4,7,11]].values
 y = df_heart.iloc[:,-1].values
 
@@ -25,7 +25,6 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, rando
 sc = StandardScaler()
 x_train = sc.fit_transform(x_train)
 x_test = sc.transform(x_test)
-
 
 
 # Initialising the ANN
@@ -56,12 +55,12 @@ np.set_printoptions()
 # Making the confusion matrix, calculating accuracy_score 
 
 # confusion matrix
-cm = confusion_matrix(y_test,y_pred)
+cm = confusion_matrix(y_test, y_pred)
 print("Confusion Matrix")
 print(cm)
 print()
 
 # accuracy
-ac = accuracy_score(y_test,y_pred)
+ac = accuracy_score(y_test, y_pred)
 print("Accuracy")
 print(ac)

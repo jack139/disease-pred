@@ -5,7 +5,6 @@ import os
 #import seaborn as sns
 
 from sklearn.preprocessing import LabelEncoder,MinMaxScaler,StandardScaler
-
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
 import torch
@@ -25,8 +24,9 @@ train_df = pd.read_csv('../datasets/heart_failure_clinical_records_dataset.csv')
 
 #train_df.info()
 
-#print(train_df.describe())
+train_df.describe().T
 
+# 转换属性值
 fix_features = pd.concat([train_df.platelets],axis=1)
 scaler = MinMaxScaler(feature_range=(0,1))
 fix_features = pd.DataFrame(scaler.fit_transform(fix_features))
@@ -34,23 +34,20 @@ df = pd.concat([train_df,fix_features],axis=1)
 df.drop(['platelets'],axis=1,inplace=True)
 df = df.rename(columns={0:'creatinine_phosphokinase',1:'platelets'})
 
-print(df)
+# 过滤特异值
+df = df[df['ejection_fraction']<70]
 
 print(df.DEATH_EVENT.value_counts(normalize=True)*100)
 
-
 # 准备数据
-train, test = df[:-40], df[-40:]
-print(train.shape, test.shape)
-
 y_train = df.DEATH_EVENT
 x_train = df.drop('DEATH_EVENT',axis=1)
 print(x_train.shape, y_train.shape)
 
-x_train, x_test, y_train, y_test = train_test_split(x_train,y_train,test_size=0.3,shuffle=True)
+x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, test_size=0.25, shuffle=True)
 
 smote = SMOTE(random_state=0)
-x_train_oversample, y_train_oversample = smote.fit_resample(x_train.values,y_train.values) 
+x_train_oversample, y_train_oversample = smote.fit_resample(x_train.values, y_train.values) 
 
 print(x_train_oversample.shape , y_train_oversample.shape)
 print(x_test.shape, y_test.shape)
@@ -63,7 +60,6 @@ class CustomDataset(Dataset):
         self.label = label
     def __len__(self):
         return len(self.data)
-    
     def __getitem__(self,idx):
         data = torch.tensor(self.data[idx],dtype=torch.float32)
         label = torch.tensor(self.label[idx],dtype=torch.float32)
@@ -108,15 +104,15 @@ train_acc = torch.zeros(n_epochs)
 train_loss = torch.zeros(n_epochs)
 valid_acc = torch.zeros(n_epochs)
 valid_loss = torch.zeros(n_epochs)
-kf = KFold(n_splits=7,shuffle=True)
+kf = KFold(n_splits=7, shuffle=True)
 for fold , (train_idx,valid_idx) in enumerate(kf.split(train_set)):
     print(f'Fold:{fold+1}')
     train_sampler_kfold = SubsetRandomSampler(train_idx)
     valid_sampler_kfold = SubsetRandomSampler(valid_idx)
     train_loader = torch.utils.data.DataLoader(train_set,batch_size=16,
-                                               num_workers=0,sampler=train_sampler_kfold,drop_last=True)
+            num_workers=0,sampler=train_sampler_kfold,drop_last=True)
     valid_loader = torch.utils.data.DataLoader(train_set,batch_size=16,
-                                num_workers=0,sampler=valid_sampler_kfold,drop_last=True)
+            num_workers=0,sampler=valid_sampler_kfold,drop_last=True)
     valid_max_acc = 0
     train_acc = torch.zeros(n_epochs)
     train_loss = torch.zeros(n_epochs)
